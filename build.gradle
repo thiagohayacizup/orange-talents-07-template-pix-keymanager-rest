@@ -4,6 +4,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("io.micronaut.application") version "2.0.6"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.5.21"
+    id("com.google.protobuf") version "0.8.15"
 }
 
 version = "0.1"
@@ -33,10 +34,11 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("io.micronaut:micronaut-validation")
 
+    implementation("io.micronaut.grpc:micronaut-grpc-client-runtime")
+
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 }
-
 
 application {
     mainClass.set("br.com.project.ApplicationKt")
@@ -58,4 +60,29 @@ tasks {
     }
 
 
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs("build/generated/source/proto/main/grpc")
+            srcDirs("build/generated/source/proto/main/java")
+        }
+    }
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:3.17.2" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.38.0" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+jar {
+    manifest {
+        attributes["Main-Class"] = "br.com.project.ApplicationKt"
+    }
 }
