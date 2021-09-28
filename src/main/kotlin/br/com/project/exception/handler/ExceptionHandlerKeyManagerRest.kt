@@ -23,9 +23,7 @@ class ExceptionHandlerKeyManagerRest : ExceptionHandler<StatusRuntimeException, 
                 "Request cannot be completed : $description "
             )
         }
-        return HttpResponse
-            .status<JsonError>( httpStatus )
-            .body( JsonError(message) )
+        return HttpResponse.status<JsonError>( httpStatus ).body( JsonError(message) )
     }
 
 }
