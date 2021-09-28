@@ -13,7 +13,7 @@ data class RegisterKeyRequest(
     val accountType : String?
 ) {
 
-    fun register( clientId : String, grpcClient : PixKeyManagerGrpc.PixKeyManagerBlockingStub ): RegisterKeyResponse {
+    fun register( clientId : String, grpcClient : PixKeyManagerGrpc.PixKeyManagerBlockingStub ): KeyResponse {
         val response = grpcClient.registerKey(
             KeyRequest.newBuilder()
                 .setClientId(clientId)
@@ -22,7 +22,7 @@ data class RegisterKeyRequest(
                 .setAccountType(accountType?.toAccountType() ?: AccountType.UNKNOWN_ACCOUNT)
                 .build()
         )
-        return RegisterKeyResponse(response.clientId,response.pixKey)
+        return KeyResponse(response.clientId,response.pixKey)
     }
 
 }

@@ -1,10 +1,9 @@
 package br.com.project.register.key
 
-import br.com.project.KeyResponse
 import br.com.project.PixKeyManagerGrpc
 import br.com.project.grpc.FactoryGRPC
 import br.com.project.register.key.controller.RegisterKeyRequest
-import br.com.project.register.key.controller.RegisterKeyResponse
+import br.com.project.register.key.controller.KeyResponse
 import io.grpc.Status
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Replaces
@@ -40,7 +39,7 @@ internal class RegisterKeyIntegrationTest{
         val pixId = UUID.randomUUID().toString()
         given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
             .willReturn(
-                KeyResponse.newBuilder()
+                br.com.project.KeyResponse.newBuilder()
                     .setClientId(clientId)
                     .setPixKey(pixId)
                     .build()
@@ -48,7 +47,7 @@ internal class RegisterKeyIntegrationTest{
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "CPF","98024709023", "CONTA_CORRENTE"
         ))
-        val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
+        val response = client.toBlocking().exchange(request, KeyResponse::class.java)
         Assertions.assertEquals( clientId, response?.body()?.clientId)
         Assertions.assertEquals( pixId, response?.body()?.pixId)
     }
@@ -59,7 +58,7 @@ internal class RegisterKeyIntegrationTest{
         val pixId = UUID.randomUUID().toString()
         given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
             .willReturn(
-                KeyResponse.newBuilder()
+                br.com.project.KeyResponse.newBuilder()
                     .setClientId(clientId)
                     .setPixKey(pixId)
                     .build()
@@ -67,7 +66,7 @@ internal class RegisterKeyIntegrationTest{
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "NUMERO_CELULAR","+5512345643", "CONTA_CORRENTE"
         ))
-        val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
+        val response = client.toBlocking().exchange(request, KeyResponse::class.java)
         Assertions.assertEquals( clientId, response?.body()?.clientId)
         Assertions.assertEquals( pixId, response?.body()?.pixId)
     }
@@ -78,7 +77,7 @@ internal class RegisterKeyIntegrationTest{
         val pixId = UUID.randomUUID().toString()
         given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
             .willReturn(
-                KeyResponse.newBuilder()
+                br.com.project.KeyResponse.newBuilder()
                     .setClientId(clientId)
                     .setPixKey(pixId)
                     .build()
@@ -86,7 +85,7 @@ internal class RegisterKeyIntegrationTest{
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "EMAIL","email@email.com", "CONTA_POUPANCA"
         ))
-        val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
+        val response = client.toBlocking().exchange(request, KeyResponse::class.java)
         Assertions.assertEquals( clientId, response?.body()?.clientId)
         Assertions.assertEquals( pixId, response?.body()?.pixId)
     }
@@ -97,7 +96,7 @@ internal class RegisterKeyIntegrationTest{
         val pixId = UUID.randomUUID().toString()
         given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
             .willReturn(
-                KeyResponse.newBuilder()
+                br.com.project.KeyResponse.newBuilder()
                     .setClientId(clientId)
                     .setPixKey(pixId)
                     .build()
@@ -105,7 +104,7 @@ internal class RegisterKeyIntegrationTest{
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "CHAVE_ALEATORIA",null, "CONTA_CORRENTE"
         ))
-        val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
+        val response = client.toBlocking().exchange(request, KeyResponse::class.java)
         Assertions.assertEquals( clientId, response?.body()?.clientId)
         Assertions.assertEquals( pixId, response?.body()?.pixId)
     }
@@ -120,7 +119,7 @@ internal class RegisterKeyIntegrationTest{
                     .INVALID_ARGUMENT
                     .withDescription("Invalid value for key type.")
                     .asRuntimeException()
-            ).thenReturn( KeyResponse.newBuilder().build() )
+            ).thenReturn( br.com.project.KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "CHAVE_ALEATORIA","email@email.com", "CONTA_CORRENTE"
         ))
@@ -141,7 +140,7 @@ internal class RegisterKeyIntegrationTest{
                     .ALREADY_EXISTS
                     .withDescription("Key already exists.")
                     .asRuntimeException()
-            ).thenReturn( KeyResponse.newBuilder().build() )
+            ).thenReturn( br.com.project.KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "EMAIL","email@email.com", "CONTA_CORRENTE"
         ))
@@ -162,7 +161,7 @@ internal class RegisterKeyIntegrationTest{
                     .INVALID_ARGUMENT
                     .withDescription("Invalid Key Type.")
                     .asRuntimeException()
-            ).thenReturn( KeyResponse.newBuilder().build() )
+            ).thenReturn( br.com.project.KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "AAAA","email@email.com", "CONTA_CORRENTE"
         ))
@@ -183,7 +182,7 @@ internal class RegisterKeyIntegrationTest{
                     .INVALID_ARGUMENT
                     .withDescription("Invalid Account Type.")
                     .asRuntimeException()
-            ).thenReturn( KeyResponse.newBuilder().build() )
+            ).thenReturn( br.com.project.KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "EMAIL","email@email.com", "AAAA"
         ))
@@ -203,7 +202,7 @@ internal class RegisterKeyIntegrationTest{
                     .INVALID_ARGUMENT
                     .withDescription("Invalid Client Id.")
                     .asRuntimeException()
-            ).thenReturn( KeyResponse.newBuilder().build() )
+            ).thenReturn( br.com.project.KeyResponse.newBuilder().build() )
         val request = POST("register-key/aaaaaa", RegisterKeyRequest(
             "EMAIL","email@email.com", "CONTA_CORRENTE"
         ))
@@ -224,7 +223,7 @@ internal class RegisterKeyIntegrationTest{
                     .INTERNAL
                     .withDescription("Internal error.")
                     .asRuntimeException()
-            ).thenReturn( KeyResponse.newBuilder().build() )
+            ).thenReturn( br.com.project.KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "EMAIL","email@email.com", "CONTA_CORRENTE"
         ))

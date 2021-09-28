@@ -16,7 +16,7 @@ class RegisterKeyController(
 ) {
 
     @Post("register-key/{clientId}")
-    fun registerKey( @PathVariable clientId : String, @Valid @Body registerKeyRequest : RegisterKeyRequest ) : HttpResponse<RegisterKeyResponse>{
+    fun registerKey( @PathVariable clientId : String, @Valid @Body registerKeyRequest : RegisterKeyRequest ) : HttpResponse<KeyResponse>{
         val response = registerKeyRequest.register(clientId, pixKeyManagerGrpc)
         return HttpResponse
             .created( response )

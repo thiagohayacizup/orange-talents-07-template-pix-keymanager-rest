@@ -1,6 +1,6 @@
 package br.com.project.register.key.controller
 
-data class RegisterKeyResponse(
+data class KeyResponse(
     val clientId : String,
     val pixId : String
 )
