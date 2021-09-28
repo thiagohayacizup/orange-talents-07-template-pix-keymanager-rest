@@ -10,6 +10,7 @@ import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.http.HttpRequest.POST
 import io.micronaut.http.HttpStatus
+import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.http.hateoas.JsonError
@@ -18,6 +19,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito
 import java.util.*
@@ -29,17 +31,65 @@ internal class RegisterKeyIntegrationTest{
     private lateinit var pixKeyManagerBlockingStub: PixKeyManagerGrpc.PixKeyManagerBlockingStub
 
     @field:Inject
-    @field:Client(value = "/")
-    private lateinit var client : io.micronaut.http.client.HttpClient
+    @field:Client("/")
+    private lateinit var client : HttpClient
 
     @Test
-    fun `register cpf key`(){}
+    fun `register cpf key`(){
+        val clientId = UUID.randomUUID().toString()
+        val pixId = UUID.randomUUID().toString()
+        given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
+            .willReturn(
+                KeyResponse.newBuilder()
+                    .setClientId(clientId)
+                    .setPixKey(pixId)
+                    .build()
+            )
+        val request = POST("register-key/$clientId", RegisterKeyRequest(
+            "CPF","98024709023", "CONTA_CORRENTE"
+        ))
+        val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
+        Assertions.assertEquals( clientId, response?.body()?.clientId)
+        Assertions.assertEquals( pixId, response?.body()?.pixId)
+    }
 
     @Test
-    fun `register cellphone key`(){}
+    fun `register cellphone key`(){
+        val clientId = UUID.randomUUID().toString()
+        val pixId = UUID.randomUUID().toString()
+        given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
+            .willReturn(
+                KeyResponse.newBuilder()
+                    .setClientId(clientId)
+                    .setPixKey(pixId)
+                    .build()
+            )
+        val request = POST("register-key/$clientId", RegisterKeyRequest(
+            "NUMERO_CELULAR","+5512345643", "CONTA_CORRENTE"
+        ))
+        val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
+        Assertions.assertEquals( clientId, response?.body()?.clientId)
+        Assertions.assertEquals( pixId, response?.body()?.pixId)
+    }
 
     @Test
-    fun `register email key`(){}
+    fun `register email key`(){
+        val clientId = UUID.randomUUID().toString()
+        val pixId = UUID.randomUUID().toString()
+        given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
+            .willReturn(
+                KeyResponse.newBuilder()
+                    .setClientId(clientId)
+                    .setPixKey(pixId)
+                    .build()
+            )
+        val request = POST("register-key/$clientId", RegisterKeyRequest(
+            "EMAIL","email@email.com", "CONTA_POUPANCA"
+        ))
+        val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
+        Assertions.assertEquals( clientId, response?.body()?.clientId)
+        Assertions.assertEquals( pixId, response?.body()?.pixId)
+    }
 
     @Test
     fun `register random key `(){
@@ -53,7 +103,7 @@ internal class RegisterKeyIntegrationTest{
                     .build()
             )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
-            "CHAVE_ALEATORIA","", "CONTA_CORRENTE"
+            "CHAVE_ALEATORIA",null, "CONTA_CORRENTE"
         ))
         val response = client.toBlocking().exchange(request, RegisterKeyResponse::class.java)
         Assertions.assertEquals( clientId, response?.body()?.clientId)
@@ -70,15 +120,15 @@ internal class RegisterKeyIntegrationTest{
                     .INVALID_ARGUMENT
                     .withDescription("Invalid value for key type.")
                     .asRuntimeException()
-            )
+            ).thenReturn( KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "CHAVE_ALEATORIA","email@email.com", "CONTA_CORRENTE"
         ))
-        try { client.toBlocking().exchange(request, JsonError::class.java) }
-        catch ( exception : HttpClientResponseException ){
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.status )
-            Assertions.assertEquals("Invalid value for key type.", exception.message)
+        val thrown = assertThrows<HttpClientResponseException> {
+            client.toBlocking().exchange(request, JsonError::class.java)
         }
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrown.status )
+        Assertions.assertEquals("Invalid value for key type.", thrown.message)
     }
 
     @Test
@@ -91,15 +141,15 @@ internal class RegisterKeyIntegrationTest{
                     .ALREADY_EXISTS
                     .withDescription("Key already exists.")
                     .asRuntimeException()
-            )
+            ).thenReturn( KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "EMAIL","email@email.com", "CONTA_CORRENTE"
         ))
-        try { client.toBlocking().exchange(request, JsonError::class.java) }
-        catch ( exception : HttpClientResponseException ){
-            Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, exception.status )
-            Assertions.assertEquals("Key already exists.", exception.message)
+        val thrown = assertThrows<HttpClientResponseException> {
+            client.toBlocking().exchange(request, JsonError::class.java)
         }
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, thrown.status )
+        Assertions.assertEquals("Key already exists.", thrown.message)
     }
 
     @Test
@@ -112,15 +162,15 @@ internal class RegisterKeyIntegrationTest{
                     .INVALID_ARGUMENT
                     .withDescription("Invalid Key Type.")
                     .asRuntimeException()
-            )
+            ).thenReturn( KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "AAAA","email@email.com", "CONTA_CORRENTE"
         ))
-        try { client.toBlocking().exchange(request, JsonError::class.java) }
-        catch ( exception : HttpClientResponseException ){
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.status )
-            Assertions.assertEquals("Invalid Key Type.", exception.message)
+        val thrown = assertThrows<HttpClientResponseException> {
+            client.toBlocking().exchange(request, JsonError::class.java)
         }
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrown.status )
+        Assertions.assertEquals("Invalid Key Type.", thrown.message)
     }
 
     @Test
@@ -133,36 +183,56 @@ internal class RegisterKeyIntegrationTest{
                     .INVALID_ARGUMENT
                     .withDescription("Invalid Account Type.")
                     .asRuntimeException()
-            )
+            ).thenReturn( KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "EMAIL","email@email.com", "AAAA"
         ))
-        try { client.toBlocking().exchange(request, JsonError::class.java) }
-        catch ( exception : HttpClientResponseException ){
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.status )
-            Assertions.assertEquals("Invalid Account Type.", exception.message)
+        val thrown = assertThrows<HttpClientResponseException> {
+            client.toBlocking().exchange(request, JsonError::class.java)
         }
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrown.status )
+        Assertions.assertEquals("Invalid Account Type.", thrown.message)
     }
 
     @Test
     fun `invalid client id`(){
-        val clientId = UUID.randomUUID().toString()
-        given( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
-            .willThrow(
+        Mockito
+            .`when`( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
+            .thenThrow(
                 Status
                     .INVALID_ARGUMENT
                     .withDescription("Invalid Client Id.")
                     .asRuntimeException()
-            )
+            ).thenReturn( KeyResponse.newBuilder().build() )
+        val request = POST("register-key/aaaaaa", RegisterKeyRequest(
+            "EMAIL","email@email.com", "CONTA_CORRENTE"
+        ))
+        val thrown = assertThrows<HttpClientResponseException> {
+            client.toBlocking().exchange(request, JsonError::class.java)
+        }
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrown.status )
+        Assertions.assertEquals("Invalid Client Id.", thrown.message)
+    }
+
+    @Test
+    fun `internal error`(){
+        val clientId = UUID.randomUUID().toString()
+        Mockito
+            .`when`( pixKeyManagerBlockingStub.registerKey(Mockito.any()))
+            .thenThrow(
+                Status
+                    .INTERNAL
+                    .withDescription("Internal error.")
+                    .asRuntimeException()
+            ).thenReturn( KeyResponse.newBuilder().build() )
         val request = POST("register-key/$clientId", RegisterKeyRequest(
             "EMAIL","email@email.com", "CONTA_CORRENTE"
         ))
-        client.toBlocking().exchange(request, JsonError::class.java)
-        try { client.toBlocking().exchange(request, JsonError::class.java) }
-        catch ( exception : HttpClientResponseException ){
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.status )
-            Assertions.assertEquals("Invalid Client Id.", exception.message)
+        val thrown = assertThrows<HttpClientResponseException> {
+            client.toBlocking().exchange(request, JsonError::class.java)
         }
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, thrown.status )
+        Assertions.assertEquals("Request cannot be completed : Internal error.", thrown.message)
     }
 
     @Factory

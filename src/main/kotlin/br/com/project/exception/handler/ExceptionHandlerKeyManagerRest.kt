@@ -8,9 +8,10 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.hateoas.JsonError
 import io.micronaut.http.server.exceptions.ExceptionHandler
 import jakarta.inject.Singleton
+import javax.validation.ConstraintViolationException
 
 @Singleton
-class ExceptionHandlerKeyManagerRest : ExceptionHandler<StatusRuntimeException, HttpResponse<Any>> {
+class ExceptionHandlerKeyManagerRest : ExceptionHandler<StatusRuntimeException, HttpResponse<Any>>{
 
     override fun handle(request: HttpRequest<*>?, exception: StatusRuntimeException?): HttpResponse<Any> {
         val description = exception?.status?.description ?: ""
@@ -20,7 +21,7 @@ class ExceptionHandlerKeyManagerRest : ExceptionHandler<StatusRuntimeException, 
             Status.ALREADY_EXISTS.code -> Pair( HttpStatus.UNPROCESSABLE_ENTITY, description )
             else -> Pair(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Request cannot be completed : $description "
+                "Request cannot be completed : $description"
             )
         }
         return HttpResponse.status<JsonError>( httpStatus ).body( JsonError(message) )

@@ -18,7 +18,6 @@ class RegisterKeyController(
     @Post("register-key/{clientId}")
     fun registerKey( @PathVariable clientId : String, @Valid @Body registerKeyRequest : RegisterKeyRequest ) : HttpResponse<RegisterKeyResponse>{
         val response = registerKeyRequest.register(clientId, pixKeyManagerGrpc)
-        println("eee")
         return HttpResponse
             .created( response )
             .header("Location", HttpResponse.uri("client/$clientId/pix/${response.pixId}").toString() )
