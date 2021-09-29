@@ -45,8 +45,8 @@ class LoadKeyController(
                     ),
                     Instant
                         .ofEpochSecond(
-                            response.pixKey.createdAt.getSeconds(),
-                            response.pixKey.createdAt.getNanos().toLong()
+                            response.pixKey.createdAt.seconds,
+                            response.pixKey.createdAt.nanos.toLong()
                         ).atZone( ZoneId.of("America/Sao_Paulo") )
                         .toLocalDateTime()
                 )
@@ -78,13 +78,12 @@ class LoadKeyController(
                     ),
                     Instant
                         .ofEpochSecond(
-                            response.pixKey.createdAt.getSeconds(),
-                            response.pixKey.createdAt.getNanos().toLong()
+                            response.pixKey.createdAt.seconds,
+                            response.pixKey.createdAt.nanos.toLong()
                         ).atZone( ZoneId.of("America/Sao_Paulo") )
                         .toLocalDateTime()
                 )
             )
         )
     }
-
 }
